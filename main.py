@@ -1,5 +1,6 @@
-from UI import UI
 import sys
+
+from src.UI import UI
 
 
 def main():

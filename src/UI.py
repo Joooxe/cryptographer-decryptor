@@ -1,11 +1,9 @@
 import argparse
 import sys
 import os
-import CaesarCipher as Caesar
-import VigenereCipher as Vigenere
-import VernamCipher as Vernam
-import CaesarBreaker as Breaker
-import Steganography as Stego
+
+from src.ciphers import vernam_cipher as vernam, caesar_cipher as caesar, steganography as stego, \
+    caesar_breaker as breaker, vigenere_cipher as vigenere
 
 
 class UI:
@@ -75,19 +73,19 @@ class UI:
 
         if cipher_type == "caesar":
             key = input("Enter the encryption key (shift number): ")
-            cipher = Caesar.CaesarCipher(message)
+            cipher = caesar.CaesarCipher(message)
             encrypted_message = cipher.encrypt(int(key))
             print("Encrypted message:", encrypted_message)
             UI.save_result(encrypted_message, key, "Encrypted")
         elif cipher_type == "vigenere":
             key = input("Enter the encryption key: ")
-            cipher = Vigenere.VigenereCipher(message)
+            cipher = vigenere.VigenereCipher(message)
             encrypted_message = cipher.encrypt(key)
             print("Encrypted message:", encrypted_message)
             UI.save_result(encrypted_message, key, "Encrypted")
         elif cipher_type == "vernam":
-            cipher = Vernam.VernamCipher(message)
-            key = Vernam.VernamCipher.generate_key(len(message))
+            cipher = vernam.VernamCipher(message)
+            key = vernam.VernamCipher.generate_key(len(message))
             encrypted_message = cipher.encrypt(key)
             print("Encrypted message:", encrypted_message)
             print("Key:", key)
@@ -106,17 +104,17 @@ class UI:
 
         key = input("Enter the decryption key: ")
         if cipher_type == "caesar":
-            cipher = Caesar.CaesarCipher(message)
+            cipher = caesar.CaesarCipher(message)
             decrypted_message = cipher.decrypt(int(key))
             print("Decrypted message:", decrypted_message)
             UI.save_result(decrypted_message, key, "Decrypted")
         elif cipher_type == "vigenere":
-            cipher = Vigenere.VigenereCipher(message)
+            cipher = vigenere.VigenereCipher(message)
             decrypted_message = cipher.decrypt(key)
             print("Decrypted message:", decrypted_message)
             UI.save_result(decrypted_message, key, "Decrypted")
         elif cipher_type == "vernam":
-            cipher = Vernam.VernamCipher(message)
+            cipher = vernam.VernamCipher(message)
             decrypted_message = cipher.decrypt(key)
             print("Decrypted message:", decrypted_message)
             UI.save_result(decrypted_message, key, "Decrypted")
@@ -126,11 +124,11 @@ class UI:
         message = UI.get_message()
         if message is None:
             return
-        breaker = Breaker.CaesarBypass(message)
-        best_shift = breaker.caesar_breaker()
+        bypass = breaker.CaesarBypass(message)
+        best_shift = bypass.caesar_breaker()
         if best_shift is not None:
             print("Best shift found:", best_shift)
-            cipher = Caesar.CaesarCipher(message)
+            cipher = caesar.CaesarCipher(message)
             decrypted_message = cipher.decrypt(best_shift)
             print("Decrypted message:", decrypted_message)
             UI.save_result(decrypted_message, best_shift, "Unscrambled")
@@ -139,11 +137,11 @@ class UI:
 
         is_plot = input("Would you like to plot the cipher? (y/n): ")
         if is_plot.lower() == "y":
-            breaker.FrequencyAnalyzer_cipher.plot_distribution()
+            bypass.FrequencyAnalyzer_cipher.plot_distribution()
 
         is_plot = input("Would you like to see standard plot? (y/n): ")
         if is_plot.lower() == "y":
-            breaker.FrequencyAnalyzer_standard.plot_distribution()
+            bypass.FrequencyAnalyzer_standard.plot_distribution()
             print("Btw you can load you own text to set standard frequency in frequency analyzer")
             print("No guarantee it will work tho")
 
@@ -160,7 +158,7 @@ class UI:
             message = UI.get_message()
             if message is None:
                 return
-            steganography = Stego.Steganography(path)
+            steganography = stego.Steganography(path)
             image = steganography.hide(message)
             image.save("../images/img_with_message.png")
             print("Done, message saved in img_with_message.png!")
@@ -168,7 +166,7 @@ class UI:
             path = input("Enter the path to the image: ")
             if not (os.path.exists(path)):
                 print("Invalid path.")
-            steganography = Stego.Steganography(path)
+            steganography = stego.Steganography(path)
             message = steganography.reveal()
             print("Message revealed: ", message)
         else:
